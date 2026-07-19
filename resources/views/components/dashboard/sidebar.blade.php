@@ -97,12 +97,12 @@ $navSystem = [
 ];
 @endphp
 
-<aside :class="desktopSidebarOpen ? 'w-72' : 'w-20'" 
-       class="fixed inset-y-0 left-0 z-40 bg-white border-r border-slate-100 flex-col hidden lg:flex transition-all duration-300">
+<aside :class="{ 'w-72': desktopSidebarOpen, 'w-20': !desktopSidebarOpen }" 
+       class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-100 flex-col hidden lg:flex transition-all duration-300">
 
     {{-- ── Logo ────────────────────────────────────────────────────── --}}
-    <div class="flex items-center h-16 border-b border-slate-100 shrink-0 transition-all duration-300 overflow-hidden" 
-         :class="desktopSidebarOpen ? 'px-5 gap-3' : 'justify-center px-0'">
+    <div class="flex items-center h-16 border-b border-slate-100 shrink-0 transition-all duration-300 overflow-hidden px-6 w-72" 
+         :class="{ 'px-6 w-72': desktopSidebarOpen, 'px-0 w-20 justify-center': !desktopSidebarOpen }">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
             <img
                 src="{{ asset('images/todogo-logo.png') }}"

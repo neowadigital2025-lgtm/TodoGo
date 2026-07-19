@@ -9,20 +9,38 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    {{-- Alpine.js --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+    <script>
+        window.getDesktopSidebarState = function() {
+            try { return localStorage.getItem('desktopSidebarOpen') !== 'false'; } 
+            catch(e) { return true; }
+        };
+        window.setDesktopSidebarState = function(val) {
+            try { localStorage.setItem('desktopSidebarOpen', val); } 
+            catch(e) {}
+        };
+    </script>
 </head>
 <body
     x-data="{ 
         sidebarOpen: false, 
-        desktopSidebarOpen: localStorage.getItem('desktopSidebarOpen') !== 'false',
+        desktopSidebarOpen: window.getDesktopSidebarState(),
         fabOpen: false
     }"
-    x-init="$watch('desktopSidebarOpen', val => localStorage.setItem('desktopSidebarOpen', val))"
+    x-init="$watch('desktopSidebarOpen', val => window.setDesktopSidebarState(val))"
     class="h-full bg-slate-50 antialiased"
     style="font-family: 'Plus Jakarta Sans', sans-serif;"
 >
 
     {{-- ── Mobile overlay ─────────────────────────────────────────── --}}
     <div
+        x-cloak
         x-show="sidebarOpen"
         x-transition:enter="transition-opacity ease-out duration-300"
         x-transition:enter-start="opacity-0"
@@ -41,7 +59,7 @@
     @include('components.dashboard.mobile-sidebar')
 
     {{-- ── Main content area ──────────────────────────────────────── --}}
-    <div :class="desktopSidebarOpen ? 'lg:pl-72' : 'lg:pl-20'" class="flex flex-col min-h-full transition-all duration-300">
+    <div :class="{ 'lg:pl-72': desktopSidebarOpen, 'lg:pl-20': !desktopSidebarOpen }" class="lg:pl-72 flex flex-col min-h-full transition-all duration-300">
 
         {{-- Navbar --}}
         @include('components.dashboard.navbar')
@@ -56,7 +74,8 @@
     {{-- ── Floating Action Button (FAB) ───────────────────────────── --}}
     <div class="fixed bottom-6 right-6 z-50">
         {{-- FAB Dropdown --}}
-        <div x-show="fabOpen"
+        <div x-cloak
+             x-show="fabOpen"
              @click.outside="fabOpen = false"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 translate-y-4 scale-95"

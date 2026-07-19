@@ -92,6 +92,7 @@ $navSystem = [
 @endphp
 
 <aside
+    x-cloak
     x-show="sidebarOpen"
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="opacity-0 -translate-x-full"
@@ -115,7 +116,7 @@ $navSystem = [
             <span class="text-[17px] font-bold text-slate-800 tracking-tight">TodoGo</span>
         </div>
 
-        <button @click="sidebarOpen = false"
+        <button type="button" @click="sidebarOpen = false"
                 class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100
                        transition-colors duration-150">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"

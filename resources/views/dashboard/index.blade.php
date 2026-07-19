@@ -152,6 +152,19 @@ $todayNotes = [
 $chartDays = ['Sen', 'Sal', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 $chartBars = [55, 70, 60, 90, 75, 45, 30];
 $chartMax  = max($chartBars);
+
+/* ── Welcome card stats ───────────────────────────────────────────────────
+ * Derived from the placeholder arrays above for now. Once a real Task
+ * model exists, replace these three lines with actual queries, e.g.:
+ *   $runningTasksCount     = auth()->user()->tasks()->where('status', 'in_progress')->count();
+ *   $deadlinesThisWeekCount = auth()->user()->tasks()->whereBetween('due_date', [now()->startOfWeek(), now()->endOfWeek()])->count();
+ *   $productivityPercent    = $total ? round($completed / $total * 100) : 0;
+ * ──────────────────────────────────────────────────────────────────────── */
+$runningTasksCount      = (int) (collect($stats)->firstWhere('label', 'Dalam Proses')['value'] ?? 0);
+$deadlinesThisWeekCount = count($deadlines);
+$totalTasksCount        = (int) (collect($stats)->firstWhere('label', 'Total Tugas')['value'] ?? 0);
+$completedTasksCount    = (int) (collect($stats)->firstWhere('label', 'Selesai')['value'] ?? 0);
+$productivityPercent    = $totalTasksCount > 0 ? (int) round($completedTasksCount / $totalTasksCount * 100) : 0;
 @endphp
 
 {{-- ══════════════════════════════════════════════════════════════════════
@@ -160,7 +173,10 @@ $chartMax  = max($chartBars);
 <div class="max-w-screen-xl mx-auto space-y-6">
 
     {{-- ── 1. Greeting ─────────────────────────────────────────────── --}}
-    <x-dashboard.welcome-card />
+    <x-dashboard.welcome-card
+        :runningTasks="$runningTasksCount"
+        :deadlinesThisWeek="$deadlinesThisWeekCount"
+        :productivity="$productivityPercent" />
 
     {{-- ── 2. Stats row ─────────────────────────────────────────────── --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

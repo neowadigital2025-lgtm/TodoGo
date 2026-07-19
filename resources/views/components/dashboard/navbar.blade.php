@@ -1,7 +1,7 @@
 <header class="sticky top-0 z-30 bg-white border-b border-slate-100 h-16 flex items-center px-4 lg:px-6 gap-4">
 
     {{-- Hamburger (mobile only) --}}
-    <button @click="sidebarOpen = !sidebarOpen"
+    <button type="button" @click="sidebarOpen = !sidebarOpen"
         class="lg:hidden p-1.5 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors shrink-0">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -12,7 +12,7 @@
     </button>
 
     {{-- Hamburger (desktop only) --}}
-    <button @click="desktopSidebarOpen = !desktopSidebarOpen"
+    <button type="button" @click="desktopSidebarOpen = !desktopSidebarOpen"
         class="hidden lg:block p-1.5 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors shrink-0">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

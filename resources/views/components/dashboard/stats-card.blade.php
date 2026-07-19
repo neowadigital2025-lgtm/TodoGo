@@ -32,27 +32,34 @@
     'icon'       => '',
 ])
 
-<div class="bg-white border border-slate-100 rounded-xl p-5 flex items-center gap-4">
+<div class="bg-white border border-slate-100 rounded-2xl p-5 flex items-center gap-4 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 hover:border-blue-100 group">
 
     {{-- Icon bubble --}}
-    <div class="w-11 h-11 rounded-xl {{ $iconColor }} flex items-center justify-center shrink-0">
+    <div class="w-12 h-12 rounded-xl {{ $iconColor }} flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110">
         <svg class="w-5 h-5 {{ $iconStroke }}" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             {!! $icon !!}
         </svg>
     </div>
 
     {{-- Text --}}
-    <div class="min-w-0">
-        <p class="text-xs font-medium text-slate-500">{{ $label }}</p>
-        <p class="text-2xl font-bold text-slate-800 leading-tight">{{ $value }}</p>
+    <div class="min-w-0 flex-1">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{{ $label }}</p>
+        <p class="text-3xl font-extrabold text-slate-800 leading-none">{{ $value }}</p>
 
         @if ($trend)
-            <p class="text-xs font-medium mt-0.5 {{ $trendUp ? 'text-green-500' : 'text-red-400' }}">
+            <p class="text-xs font-medium mt-1.5 flex items-center gap-1 {{ $trendUp ? 'text-green-500' : 'text-red-500' }}">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if($trendUp)
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    @else
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"/>
+                    @endif
+                </svg>
                 {{ $trend }}
             </p>
         @elseif ($trendNote)
-            <p class="text-xs font-medium mt-0.5 text-slate-400">
+            <p class="text-xs font-medium mt-1.5 text-slate-400">
                 {{ $trendNote }}
             </p>
         @endif

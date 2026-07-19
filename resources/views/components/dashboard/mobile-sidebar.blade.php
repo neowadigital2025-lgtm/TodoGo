@@ -14,21 +14,21 @@ $navMain = [
     ],
     [
         'label' => 'Tugas',
-        'href'  => '#',
+        'href'  => route('tasks'),
         'route' => 'tasks',
         'icon'  => '<polyline points="9 11 12 14 22 4"/>
                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
     ],
     [
         'label' => 'Ruang Kerja',
-        'href'  => '#',
+        'href'  => route('workspaces'),
         'route' => 'workspaces',
         'icon'  => '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
                     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
     ],
     [
         'label' => 'Kalender',
-        'href'  => '#',
+        'href'  => route('calendar'),
         'route' => 'calendar',
         'icon'  => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                     <line x1="16" y1="2" x2="16" y2="6"/>
@@ -40,7 +40,7 @@ $navMain = [
 $navSecondary = [
     [
         'label' => 'Notifikasi',
-        'href'  => '#',
+        'href'  => route('notifications'),
         'route' => 'notifications',
         'badge' => 3,
         'icon'  => '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -48,8 +48,8 @@ $navSecondary = [
     ],
     [
         'label' => 'Langganan',
-        'href'  => '#',
-        'route' => 'subscriptions',
+        'href'  => route('subscription'),
+        'route' => 'subscription',
         'icon'  => '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
     ],
 ];
@@ -57,14 +57,14 @@ $navSecondary = [
 $navSystem = [
     [
         'label' => 'Profil',
-        'href'  => '#',
+        'href'  => route('profile'),
         'route' => 'profile',
         'icon'  => '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                     <circle cx="12" cy="7" r="4"/>',
     ],
     [
         'label' => 'Pengaturan',
-        'href'  => '#',
+        'href'  => route('settings'),
         'route' => 'settings',
         'icon'  => '<circle cx="12" cy="12" r="3"/>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06
@@ -82,7 +82,7 @@ $navSystem = [
     ],
     [
         'label' => 'Bantuan',
-        'href'  => '#',
+        'href'  => route('help'),
         'route' => 'help',
         'icon'  => '<circle cx="12" cy="12" r="10"/>
                     <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
@@ -93,13 +93,14 @@ $navSystem = [
 
 <aside
     x-show="sidebarOpen"
-    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="opacity-0 -translate-x-full"
     x-transition:enter-end="opacity-100 translate-x-0"
-    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100 translate-x-0"
     x-transition:leave-end="opacity-0 -translate-x-full"
-    class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-100 flex flex-col lg:hidden"
+    @click.outside="sidebarOpen = false"
+    class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-100 flex flex-col lg:hidden shadow-2xl"
 >
 
     {{-- ── Logo + close ─────────────────────────────────────────────── --}}

@@ -1,6 +1,10 @@
-{{-- ════════════════════════════════════════════════════════
-    Desktop Sidebar  ·  Dynamic width  ·  hidden on mobile
-════════════════════════════════════════════════════════ --}}
+{{-- ==========================================================
+Component : Sidebar (Desktop)
+Folder    : dashboard/layout
+Purpose   : Sidebar navigasi desktop yang dapat dikecilkan/dibesarkan.
+            Menggunakan Alpine.js `desktopSidebarOpen` untuk toggle lebar.
+            Tersembunyi di layar mobile (lg:flex).
+========================================================== --}}
 
 @php
 /*

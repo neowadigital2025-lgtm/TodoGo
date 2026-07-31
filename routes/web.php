@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SettingsController;
@@ -60,12 +61,13 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard');
 
     // Tasks
-    Route::get('/tasks', [TaskController::class, 'index'])
-        ->name('tasks');
+    Route::resource('tasks', TaskController::class);
 
     // Workspaces
-    Route::get('/workspaces', [WorkspaceController::class, 'index'])
-        ->name('workspaces');
+    Route::resource('workspaces', WorkspaceController::class);
+
+    // Notes
+    Route::resource('notes', NoteController::class);
 
     // Calendar
     Route::get('/calendar', [CalendarController::class, 'index'])

@@ -1,7 +1,10 @@
-{{-- ════════════════════════════════════════════════════════
-     Mobile Sidebar Drawer  ·  Alpine: sidebarOpen
-     Slides in from the left, lg:hidden
-════════════════════════════════════════════════════════ --}}
+{{-- ==========================================================
+Component : Mobile Sidebar Drawer
+Folder    : dashboard/layout
+Purpose   : Sidebar navigasi khusus mobile yang slide dari kiri.
+            Dikontrol Alpine.js `sidebarOpen`.
+            Disembunyikan di desktop (lg:hidden).
+========================================================== --}}
 
 @php
 $navMain = [
@@ -106,26 +109,25 @@ $navSystem = [
 
     {{-- ── Logo + close ─────────────────────────────────────────────── --}}
     <div class="flex items-center justify-between h-16 px-5 border-b border-slate-100 shrink-0">
-        <div class="flex items-center h-16 border- shrink-0 transition-all duration-300 overflow-hidden px-6 w-72" 
-         :class="{ 'px-6 w-72': desktopSidebarOpen, 'px-0 w-20 justify-center': !desktopSidebarOpen }">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-            <img
-                src="{{ asset('images/todogo-logo.png') }}"
-                alt="TodoGo"
-                class="w-10 h-10 rounded-lg object-cover object-top shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <span class="text-[17px] font-bold text-slate-800 tracking-tight">TodoGo</span>
+        </div>
 
-            <span x-show="desktopSidebarOpen" 
-                  x-transition:enter="transition-opacity ease-out duration-300 delay-150"
-                  x-transition:enter-start="opacity-0"
-                  x-transition:enter-end="opacity-100"
-                  x-transition:leave="transition-opacity ease-in duration-100"
-                  x-transition:leave-start="opacity-100"
-                  x-transition:leave-end="opacity-0"
-                  class="text-2xl font-bold text-slate-900 whitespace-nowrap">
-                Todo<span class="text-blue-600">Go</span>
-            </span>
-        </a>
-    </div>
+        <button type="button" @click="sidebarOpen = false"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100
+                       transition-colors duration-150">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6"  x2="6"  y2="18"/>
+                <line x1="6"  y1="6"  x2="18" y2="18"/>
+            </svg>
+        </button>
     </div>
 
     {{-- ── Navigation ───────────────────────────────────────────────── --}}

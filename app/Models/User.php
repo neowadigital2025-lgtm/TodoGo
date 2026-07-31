@@ -51,4 +51,28 @@ class User extends Authenticatable
     {
         return $this->hasMany(LoginToken::class);
     }
+
+    /**
+     * Workspaces Relationship
+     */
+    public function workspaces()
+    {
+        return $this->hasMany(Workspace::class);
+    }
+
+    /**
+     * Tasks Relationship
+     */
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    /**
+     * Notes Relationship
+     */
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
 }

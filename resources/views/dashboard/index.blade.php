@@ -25,7 +25,7 @@
 
         {{-- ── Left column (2/3 width) ──────────────────────────────── --}}
         <div class="lg:col-span-2 space-y-6 lg:space-y-8">
-            <x-dashboard.latest-task-section :latestTasks="$latestTasks" />
+            <x-dashboard.latest-task-section :latestTasks="$todaysTasks" />
             <x-dashboard.workspace-section :workspaces="$workspaces" />
         </div>{{-- /left column --}}
 

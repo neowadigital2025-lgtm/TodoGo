@@ -16,7 +16,7 @@
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-        </div
+        </div>
     @endif
 
     <form action="{{ route('notes.store') }}" method="POST" class="space-y-4">

@@ -20,19 +20,27 @@ class DashboardService
 
         $completionPercentage = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
 
-        // Latest Tasks
-        $latestTasks = $user->tasks()
-            ->with('workspace')
-            ->latest()
-            ->take(5)
-            ->get();
+        // Latest Active Tasks (show recent tasks, prioritizing today's due dates)
+        // Force show all tasks for debugging
+        $todaysTasks = \App\Models\Task::with('workspace', 'user')->latest()->take(5)->get();
+        
+        // Add debug info to Laravel log
+        \Log::info('Dashboard Debug', [
+            'user_id' => $user->id ?? 'no-user',
+            'user_tasks_count' => $user ? $user->tasks()->count() : 0,
+            'all_tasks_count' => \App\Models\Task::count(),
+            'todays_tasks_count' => $todaysTasks->count(),
+            'todays_tasks' => $todaysTasks->pluck('title')->toArray()
+        ]);
 
-        // Upcoming Deadlines (Next 5 nearest deadlines, excluding completed)
+        // Upcoming Deadlines (Next 5 days only, excluding completed)
+        $fiveDaysFromNow = now()->addDays(5)->format('Y-m-d');
         $deadlines = $user->tasks()
             ->with('workspace')
             ->where('status', '!=', 'Done')
             ->whereNotNull('due_date')
             ->whereDate('due_date', '>=', $today)
+            ->whereDate('due_date', '<=', $fiveDaysFromNow)
             ->orderBy('due_date', 'asc')
             ->take(5)
             ->get();
@@ -68,7 +76,7 @@ class DashboardService
             'deadlineToday' => $deadlineToday,
             'overdueTasks' => $overdueTasks,
             'completionPercentage' => $completionPercentage,
-            'latestTasks' => $latestTasks,
+            'todaysTasks' => $todaysTasks,
             'deadlines' => $deadlines,
             'workspaces' => $workspaces,
             'todayNotes' => $todayNotes,

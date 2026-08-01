@@ -1,26 +1,34 @@
-{{-- ════════════════════════════════════════════════════════
-     Workspace Card
-     Props:
-       $name        — string   workspace name
-       $taskCount   — int      number of tasks
-       $color       — string   Tailwind bg utility for the folder icon e.g. "bg-blue-500"
-       $memberCount — int      number of members shown as avatars
-════════════════════════════════════════════════════════ --}}
+{{-- ==========================================================
+Component : Workspace Card
+Folder    : dashboard
+Purpose   : Menampilkan satu card workspace dengan ikon folder, jumlah task,
+            member avatar, dan progress bar.
+            Reusable untuk Dashboard maupun halaman Workspace.
+
+Props:
+  $name        — Nama workspace (string)
+  $taskCount   — Jumlah task aktif (int, default: 0)
+  $color       — Tailwind bg utility untuk ikon: bg-blue-500, dll. (string)
+  $memberCount — Jumlah member (int, default: 1)
+  $progress    — Persentase progress 0-100 (int|null, default: null = acak)
+  $href        — URL detail workspace (string, default: '#')
+========================================================== --}}
 
 @props([
     'name'        => '',
     'taskCount'   => 0,
     'color'       => 'bg-slate-400',
     'memberCount' => 1,
+    'progress'    => null,
+    'href'        => '#',
 ])
 
-@php 
-    $shown = min($memberCount, 3); 
-    // Mocking a random progress percentage for demo purposes since it's not in the array
-    $progress = rand(30, 90);
+@php
+    $shown    = min($memberCount, 3);
+    $progress = $progress ?? rand(30, 90);
 @endphp
 
-<div class="bg-white p-5 border border-slate-100 rounded-2xl hover:border-blue-100 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer flex flex-col h-full group">
+<a href="{{ $href }}" class="bg-white p-5 border border-slate-100 rounded-2xl hover:border-blue-100 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer flex flex-col h-full group">
 
     {{-- Top section --}}
     <div class="flex items-start justify-between mb-4">
@@ -67,4 +75,4 @@
         </div>
     </div>
 
-</div>
+</a>

@@ -1,11 +1,39 @@
+{{-- ==========================================================
+Component : Note Card
+Folder    : dashboard
+Purpose   : Menampilkan satu card catatan dengan judul, preview, dan waktu.
+            Reusable untuk Dashboard (Notes Section) maupun halaman Notes.
+
+Props:
+  $title   — Judul catatan (string)
+  $preview — Teks preview isi catatan (string)
+  $time    — Waktu pembuatan/update (string)
+  $color   — Warna background card (Tailwind class, default: 'bg-slate-50')
+  $href    — URL detail catatan (string, default: '#')
+========================================================= --}}
+
 @props([
-    'title',
-    'preview',
-    'time',
-    'color' => 'bg-slate-50'
+    'title'   => '',
+    'preview' => '',
+    'time'    => '',
+    'color'   => 'bg-slate-50',
+    'href'    => '#',
 ])
 
-<div class="relative p-4 rounded-xl {{ $color }} border border-transparent hover:border-blue-200 transition-all duration-300 cursor-pointer group hover:shadow-md hover:shadow-blue-500/5 hover:-translate-y-0.5">
+@php
+    $bgColors = [
+        'bg-blue-500'   => 'bg-blue-50/70 hover:border-blue-300',
+        'bg-green-500'  => 'bg-green-50/70 hover:border-green-300',
+        'bg-purple-500' => 'bg-purple-50/70 hover:border-purple-300',
+        'bg-orange-400' => 'bg-orange-50/70 hover:border-orange-300',
+        'bg-red-500'    => 'bg-red-50/70 hover:border-red-300',
+        'bg-slate-500'  => 'bg-slate-100/70 hover:border-slate-300',
+        'bg-slate-50'   => 'bg-slate-50/70 hover:border-slate-300',
+    ];
+    $cardBg = $bgColors[$color] ?? $color;
+@endphp
+
+<a href="{{ $href }}" class="relative p-4 rounded-xl {{ $cardBg }} border border-transparent transition-all duration-300 cursor-pointer group hover:shadow-md hover:shadow-blue-500/5 hover:-translate-y-0.5 block">
     
     <div class="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <button class="p-1 text-slate-400 hover:text-slate-600 rounded">
@@ -29,4 +57,4 @@
         </svg>
         {{ $time }}
     </div>
-</div>
+</a>

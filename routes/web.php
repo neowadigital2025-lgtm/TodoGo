@@ -104,5 +104,29 @@ Route::middleware('auth')->group(function () {
         request()->session()->regenerateToken();
         return redirect('/');
     })->name('logout');
+    
+    // Debug route - temporary
+    Route::get('/debug-tasks', function() {
+        $user = auth()->user();
+        if (!$user) {
+            return 'User not logged in';
+        }
+        
+        $tasks = $user->tasks()->with('workspace')->get();
+        return [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'total_tasks' => $tasks->count(),
+            'tasks' => $tasks->map(function($task) {
+                return [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'workspace' => $task->workspace?->name,
+                    'created_at' => $task->created_at->format('Y-m-d H:i:s'),
+                    'due_date' => $task->due_date?->format('Y-m-d'),
+                ];
+            })
+        ];
+    });
 
 });

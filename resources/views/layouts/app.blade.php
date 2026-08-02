@@ -22,9 +22,60 @@
             catch(e) { return true; }
         };
         window.setDesktopSidebarState = function(val) {
-            try { localStorage.setItem('desktopSidebarOpen', val); } 
+            try { localStorage.setItem('desktopSidebarState', val); } 
             catch(e) {}
         };
+        
+        // Simple prevent multiple form submissions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track submitted forms to prevent double submission
+            const submittedForms = new Set();
+            
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                const formId = form.action + form.method;
+                
+                // Check if this form was already submitted recently
+                if (submittedForms.has(formId)) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Mark form as submitted
+                submittedForms.add(formId);
+                
+                // Remove from set after 3 seconds
+                setTimeout(() => {
+                    submittedForms.delete(formId);
+                }, 3000);
+                
+                // Disable submit buttons
+                const submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+                submitButtons.forEach(button => {
+                    button.disabled = true;
+                    button.style.opacity = '0.6';
+                    
+                    // Show loading text if it's a button
+                    if (button.tagName === 'BUTTON' && !button.dataset.originalText) {
+                        button.dataset.originalText = button.innerHTML;
+                        button.innerHTML = 'Memproses...';
+                    }
+                });
+                
+                // Re-enable after 10 seconds (fallback)
+                setTimeout(() => {
+                    submitButtons.forEach(button => {
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                        if (button.dataset.originalText) {
+                            button.innerHTML = button.dataset.originalText;
+                            delete button.dataset.originalText;
+                        }
+                    });
+                    submittedForms.delete(formId);
+                }, 10000);
+            });
+        });
     </script>
 </head>
 <body

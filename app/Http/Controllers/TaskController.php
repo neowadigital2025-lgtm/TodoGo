@@ -9,10 +9,60 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tasks = auth()->user()->tasks()->with('workspace')->latest()->get();
-        return view('tasks.index', compact('tasks'));
+        $query = auth()->user()->tasks()->with('workspace');
+        
+        // Search functionality
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+        }
+        
+        // Priority filter
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+        
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        // Get tasks with sorting
+        $tasks = $query->latest()->get();
+        
+        // Group tasks for display if filtering by priority or status
+        $groupedTasks = null;
+        $groupBy = null;
+        
+        if ($request->filled('priority')) {
+            $groupBy = 'priority';
+            $priorityOrder = ['High', 'Medium', 'Low'];
+            $grouped = $tasks->groupBy('priority');
+            $groupedTasks = collect();
+            
+            // Sort groups by priority order
+            foreach ($priorityOrder as $priority) {
+                if ($grouped->has($priority)) {
+                    $groupedTasks->put($priority, $grouped->get($priority));
+                }
+            }
+        } elseif ($request->filled('status')) {
+            $groupBy = 'status';
+            $statusOrder = ['Todo', 'In Progress', 'Done'];
+            $grouped = $tasks->groupBy('status');
+            $groupedTasks = collect();
+            
+            // Sort groups by status order
+            foreach ($statusOrder as $status) {
+                if ($grouped->has($status)) {
+                    $groupedTasks->put($status, $grouped->get($status));
+                }
+            }
+        }
+        
+        return view('tasks.index', compact('tasks', 'groupedTasks', 'groupBy'));
     }
 
     public function create()

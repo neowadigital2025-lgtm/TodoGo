@@ -29,7 +29,7 @@
     </div>
 
     {{-- ── Filter bar ───────────────────────────────────────────────── --}}
-    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+    <form method="GET" action="{{ route('tasks.index') }}" class="flex flex-col sm:flex-row items-start sm:items-center gap-3" id="filter-form">
 
         {{-- Search --}}
         <div class="relative flex-1 max-w-xs">
@@ -38,33 +38,45 @@
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <input type="text" placeholder="Cari tugas..."
+            <input type="text" name="search" placeholder="Cari tugas..." value="{{ request('search') }}"
                    class="w-full pl-9 pr-4 py-2 text-sm bg-white border border-slate-200 rounded-lg
                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                          placeholder-slate-400 transition" />
+                          placeholder-slate-400 transition"
+                   onchange="document.getElementById('filter-form').submit()" />
         </div>
 
         {{-- Priority filter --}}
-        <select class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600">
+        <select name="priority" class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600"
+                onchange="document.getElementById('filter-form').submit()">
             <option value="">Semua Prioritas</option>
-            <option value="High">Tinggi</option>
-            <option value="Medium">Sedang</option>
-            <option value="Low">Rendah</option>
+            <option value="High" {{ request('priority') === 'High' ? 'selected' : '' }}>Tinggi</option>
+            <option value="Medium" {{ request('priority') === 'Medium' ? 'selected' : '' }}>Sedang</option>
+            <option value="Low" {{ request('priority') === 'Low' ? 'selected' : '' }}>Rendah</option>
         </select>
 
         {{-- Status filter --}}
-        <select class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600">
+        <select name="status" class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600"
+                onchange="document.getElementById('filter-form').submit()">
             <option value="">Semua Status</option>
-            <option value="Todo">Belum Mulai</option>
-            <option value="In Progress">Sedang Berjalan</option>
-            <option value="Done">Selesai</option>
+            <option value="Todo" {{ request('status') === 'Todo' ? 'selected' : '' }}>Belum Mulai</option>
+            <option value="In Progress" {{ request('status') === 'In Progress' ? 'selected' : '' }}>Sedang Berjalan</option>
+            <option value="Done" {{ request('status') === 'Done' ? 'selected' : '' }}>Selesai</option>
         </select>
+
+        {{-- Clear filters --}}
+        @if(request()->hasAny(['search', 'priority', 'status']))
+            <a href="{{ route('tasks.index') }}" 
+               class="px-3 py-2 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 
+                      rounded-lg hover:bg-slate-50 transition-colors">
+                Bersihkan
+            </a>
+        @endif
 
         {{-- View toggle --}}
         <div class="flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-lg ml-auto sm:ml-0">
-            <button @click="view = 'list'"
+            <button type="button" @click="view = 'list'"
                     :class="view === 'list' ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'"
                     class="p-1.5 rounded-md transition-colors">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -75,7 +87,7 @@
                     <line x1="3" y1="18" x2="3.01" y2="18"/>
                 </svg>
             </button>
-            <button @click="view = 'grid'"
+            <button type="button" @click="view = 'grid'"
                     :class="view === 'grid' ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'"
                     class="p-1.5 rounded-md transition-colors">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -85,7 +97,8 @@
                 </svg>
             </button>
         </div>
-    </div>
+        
+    </form>
 
     {{-- ── Stats strip ──────────────────────────────────────────────── --}}
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -109,185 +122,162 @@
     </div>
 
     {{-- ── Task list view ───────────────────────────────────────────── --}}
-    <div x-show="view === 'list'" class="bg-white border border-slate-100 rounded-xl overflow-hidden">
-
-        {{-- Table header --}}
-        <div class="hidden sm:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100
-                    text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            <div class="col-span-5">Tugas</div>
-            <div class="col-span-2">Prioritas</div>
-            <div class="col-span-2">Status</div>
-            <div class="col-span-2">Deadline</div>
-            <div class="col-span-1"></div>
-        </div>
-
-        <ul class="divide-y divide-slate-50">
-            @foreach ($tasks as $task)
-            @php
-                $isDone = $task->status === 'Done';
+    <div x-show="view === 'list'">
+        
+        @if($groupedTasks && $groupBy)
+            {{-- Grouped view with separators --}}
+            @foreach($groupedTasks as $groupKey => $groupTasks)
+                @php
+                    $groupLabel = match($groupBy) {
+                        'priority' => match($groupKey) {
+                            'High' => 'Prioritas Tinggi',
+                            'Medium' => 'Prioritas Sedang', 
+                            'Low' => 'Prioritas Rendah',
+                            default => $groupKey
+                        },
+                        'status' => match($groupKey) {
+                            'Todo' => 'Belum Mulai',
+                            'In Progress' => 'Sedang Berjalan',
+                            'Done' => 'Selesai',
+                            default => $groupKey
+                        },
+                        default => $groupKey
+                    };
+                    
+                    $groupColor = match($groupBy) {
+                        'priority' => match($groupKey) {
+                            'High' => 'bg-red-50 text-red-700 border-red-200',
+                            'Medium' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                            'Low' => 'bg-slate-50 text-slate-700 border-slate-200',
+                            default => 'bg-slate-50 text-slate-700 border-slate-200'
+                        },
+                        'status' => match($groupKey) {
+                            'Todo' => 'bg-blue-50 text-blue-700 border-blue-200',
+                            'In Progress' => 'bg-orange-50 text-orange-700 border-orange-200',
+                            'Done' => 'bg-green-50 text-green-700 border-green-200',
+                            default => 'bg-slate-50 text-slate-700 border-slate-200'
+                        },
+                        default => 'bg-slate-50 text-slate-700 border-slate-200'
+                    };
+                @endphp
                 
-                $priorityColor = match($task->priority) {
-                    'High' => 'red',
-                    'Medium' => 'yellow',
-                    'Low' => 'slate',
-                    default => 'slate',
-                };
-                
-                $statusColor = match($task->status) {
-                    'Done' => 'green',
-                    'In Progress' => 'orange',
-                    'Todo' => 'slate',
-                    default => 'slate',
-                };
-            @endphp
-            <li class="group grid grid-cols-12 gap-4 items-center px-5 py-3.5
-                       hover:bg-slate-50 transition-colors duration-150">
-
-                {{-- Checkbox + title --}}
-                <div class="col-span-12 sm:col-span-5 flex items-center gap-3 min-w-0">
-                    <div class="shrink-0">
-                        @if ($isDone)
-                            <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
-                                <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="3"
-                                     stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                            </div>
-                        @else
-                            <div class="w-5 h-5 rounded-full border-2 border-slate-200
-                                        group-hover:border-blue-400 transition-colors"></div>
-                        @endif
-                    </div>
-                    <div class="min-w-0">
-                        <p class="text-sm font-medium truncate
-                                  {{ $isDone ? 'line-through text-slate-400' : 'text-slate-800' }}">
-                            {{ $task->title }}
-                        </p>
-                        <div class="flex items-center gap-1 mt-0.5">
-                            <svg class="w-3 h-3 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="2"
-                                 stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                            </svg>
-                            <span class="text-xs text-blue-500 truncate">{{ $task->workspace?->name ?? 'No Workspace' }}</span>
-                        </div>
+                {{-- Group Header --}}
+                <div class="mb-4">
+                    <div class="flex items-center gap-3 px-4 py-3 {{ $groupColor }} rounded-lg border">
+                        <div class="w-2 h-2 rounded-full bg-current opacity-60"></div>
+                        <h3 class="font-semibold text-sm">{{ $groupLabel }}</h3>
+                        <span class="text-xs opacity-75">({{ $groupTasks->count() }} tugas)</span>
                     </div>
                 </div>
+                
+                {{-- Tasks in Group --}}
+                <div class="bg-white border border-slate-100 rounded-xl overflow-hidden mb-6">
+                    {{-- Table header --}}
+                    <div class="hidden sm:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100
+                                text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                        <div class="col-span-5">Tugas</div>
+                        <div class="col-span-2">Prioritas</div>
+                        <div class="col-span-2">Status</div>
+                        <div class="col-span-2">Deadline</div>
+                        <div class="col-span-1"></div>
+                    </div>
 
-                {{-- Priority --}}
-                <div class="hidden sm:flex col-span-2">
-                    <x-ui.badge :color="$priorityColor">{{ $task->priority }}</x-ui.badge>
+                    <ul class="divide-y divide-slate-50">
+                        @foreach ($groupTasks as $task)
+                            @include('tasks.partials.task-row', ['task' => $task])
+                        @endforeach
+                    </ul>
                 </div>
-
-                {{-- Status --}}
-                <div class="hidden sm:flex col-span-2">
-                    <x-ui.badge :color="$statusColor" :dot="true">{{ $task->status }}</x-ui.badge>
-                </div>
-
-                {{-- Date --}}
-                <div class="hidden sm:block col-span-2">
-                    <span class="text-xs text-slate-500">{{ $task->due_date ? $task->due_date->format('d M Y') : '-' }}</span>
-                </div>
-
-                {{-- Actions --}}
-                <div class="hidden sm:flex col-span-1 justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <a href="{{ route('tasks.edit', $task) }}" class="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Edit">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                        </svg>
-                    </a>
-                    <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tugas ini?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Hapus">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-            </li>
             @endforeach
-        </ul>
+        @else
+            {{-- Regular ungrouped view --}}
+            <div class="bg-white border border-slate-100 rounded-xl overflow-hidden">
+                {{-- Table header --}}
+                <div class="hidden sm:grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100
+                            text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                    <div class="col-span-5">Tugas</div>
+                    <div class="col-span-2">Prioritas</div>
+                    <div class="col-span-2">Status</div>
+                    <div class="col-span-2">Deadline</div>
+                    <div class="col-span-1"></div>
+                </div>
 
+                <ul class="divide-y divide-slate-50">
+                    @foreach ($tasks as $task)
+                        @include('tasks.partials.task-row', ['task' => $task])
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        
     </div>
 
     {{-- ── Task grid view ───────────────────────────────────────────── --}}
-    <div x-show="view === 'grid'" x-cloak
-         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        @foreach ($tasks as $task)
-        @php
-            $isDone = $task->status === 'Done';
-            $priorityColor = match($task->priority) {
-                'High' => 'red',
-                'Medium' => 'yellow',
-                'Low' => 'slate',
-                default => 'slate',
-            };
-            $statusColor = match($task->status) {
-                'Done' => 'green',
-                'In Progress' => 'orange',
-                'Todo' => 'slate',
-                default => 'slate',
-            };
-        @endphp
-        <div class="bg-white border border-slate-100 rounded-xl p-4 hover:shadow-sm
-                    transition-shadow duration-150 group relative">
-
-            <div class="absolute top-4 right-4 hidden group-hover:flex gap-1">
-                <a href="{{ route('tasks.edit', $task) }}" class="p-1 bg-white border border-slate-100 rounded shadow-sm text-slate-400 hover:text-blue-600 transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                </a>
-                <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Yakin hapus?');">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="p-1 bg-white border border-slate-100 rounded shadow-sm text-slate-400 hover:text-red-600 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                    </button>
-                </form>
-            </div>
-
-            {{-- Header --}}
-            <div class="flex items-start justify-between gap-2 mb-3">
-                <div class="flex items-center gap-2">
-                    @if ($isDone)
-                        <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                            <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="3"
-                                 stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                        </div>
-                    @else
-                        <div class="w-5 h-5 rounded-full border-2 border-slate-200
-                                    group-hover:border-blue-400 transition-colors shrink-0"></div>
-                    @endif
+    <div x-show="view === 'grid'" x-cloak>
+        
+        @if($groupedTasks && $groupBy)
+            {{-- Grouped grid view --}}
+            @foreach($groupedTasks as $groupKey => $groupTasks)
+                @php
+                    $groupLabel = match($groupBy) {
+                        'priority' => match($groupKey) {
+                            'High' => 'Prioritas Tinggi',
+                            'Medium' => 'Prioritas Sedang', 
+                            'Low' => 'Prioritas Rendah',
+                            default => $groupKey
+                        },
+                        'status' => match($groupKey) {
+                            'Todo' => 'Belum Mulai',
+                            'In Progress' => 'Sedang Berjalan',
+                            'Done' => 'Selesai',
+                            default => $groupKey
+                        },
+                        default => $groupKey
+                    };
+                    
+                    $groupColor = match($groupBy) {
+                        'priority' => match($groupKey) {
+                            'High' => 'bg-red-50 text-red-700 border-red-200',
+                            'Medium' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                            'Low' => 'bg-slate-50 text-slate-700 border-slate-200',
+                            default => 'bg-slate-50 text-slate-700 border-slate-200'
+                        },
+                        'status' => match($groupKey) {
+                            'Todo' => 'bg-blue-50 text-blue-700 border-blue-200',
+                            'In Progress' => 'bg-orange-50 text-orange-700 border-orange-200',
+                            'Done' => 'bg-green-50 text-green-700 border-green-200',
+                            default => 'bg-slate-50 text-slate-700 border-slate-200'
+                        },
+                        default => 'bg-slate-50 text-slate-700 border-slate-200'
+                    };
+                @endphp
+                
+                {{-- Group Header --}}
+                <div class="col-span-full mb-4">
+                    <div class="flex items-center gap-3 px-4 py-3 {{ $groupColor }} rounded-lg border">
+                        <div class="w-2 h-2 rounded-full bg-current opacity-60"></div>
+                        <h3 class="font-semibold text-sm">{{ $groupLabel }}</h3>
+                        <span class="text-xs opacity-75">({{ $groupTasks->count() }} tugas)</span>
+                    </div>
                 </div>
-                <x-ui.badge :color="$priorityColor">{{ $task->priority }}</x-ui.badge>
+                
+                {{-- Tasks Grid --}}
+                <div class="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    @foreach ($groupTasks as $task)
+                        @include('tasks.partials.task-card', ['task' => $task])
+                    @endforeach
+                </div>
+                
+            @endforeach
+        @else
+            {{-- Regular grid view --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach ($tasks as $task)
+                    @include('tasks.partials.task-card', ['task' => $task])
+                @endforeach
             </div>
-
-            {{-- Title --}}
-            <p class="text-sm font-semibold text-slate-800 leading-snug mb-1
-                      {{ $isDone ? 'line-through text-slate-400' : '' }}">
-                {{ $task->title }}
-            </p>
-
-            {{-- Workspace --}}
-            <div class="flex items-center gap-1 mb-3">
-                <svg class="w-3 h-3 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                </svg>
-                <span class="text-xs text-blue-500 truncate">{{ $task->workspace?->name ?? 'No Workspace' }}</span>
-            </div>
-
-            {{-- Footer --}}
-            <div class="flex items-center justify-between">
-                <x-ui.badge :color="$statusColor" :dot="true">{{ $task->status }}</x-ui.badge>
-                <span class="text-xs text-slate-400">{{ $task->due_date ? $task->due_date->format('d M Y') : '-' }}</span>
-            </div>
-        </div>
-        @endforeach
+        @endif
+        
     </div>
 
 </div>

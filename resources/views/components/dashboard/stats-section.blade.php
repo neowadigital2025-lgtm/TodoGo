@@ -49,7 +49,7 @@
         :value="$completedTasks"
         :description="$completionPercentage . '% dari total tugas'"
         color="green"
-        :href="route('tasks.index')"
+        :href="route('tasks.index', ['status' => 'Done'])"
     >
         <x-slot:icon>
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -66,7 +66,7 @@
         :value="$inProgressTasks"
         description="Sedang dikerjakan"
         color="yellow"
-        :href="route('tasks.index')"
+        :href="route('tasks.index', ['status' => 'In Progress'])"
     >
         <x-slot:icon>
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -83,7 +83,7 @@
         :value="$deadlineToday"
         :description="$overdueTasks > 0 ? $overdueTasks . ' tugas terlambat' : 'Tidak ada yang terlambat'"
         color="red"
-        :href="route('tasks.index')"
+        :href="route('tasks.index', ['filter' => 'today_overdue'])"
     >
         <x-slot:icon>
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"

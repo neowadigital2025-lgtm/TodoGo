@@ -22,7 +22,11 @@ class DashboardService
 
         // Latest Active Tasks (show recent tasks, prioritizing today's due dates)
         // Force show all tasks for debugging
-        $todaysTasks = \App\Models\Task::with('workspace', 'user')->latest()->take(5)->get();
+        $todaysTasks = $user->tasks()
+        ->with('workspace')
+        ->latest()
+        ->take(5)
+        ->get();
         
         // Add debug info to Laravel log
         \Log::info('Dashboard Debug', [

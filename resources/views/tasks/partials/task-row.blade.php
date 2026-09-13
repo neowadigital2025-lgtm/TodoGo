@@ -22,18 +22,23 @@
     {{-- Checkbox + title --}}
     <div class="col-span-12 sm:col-span-5 flex items-center gap-3 min-w-0">
         <div class="shrink-0">
-            @if ($isDone)
-                <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
-                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="3"
-                         stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                </div>
-            @else
-                <div class="w-5 h-5 rounded-full border-2 border-slate-200
-                            group-hover:border-blue-400 transition-colors"></div>
-            @endif
+            <form action="{{ route('tasks.toggleStatus', $task) }}" method="POST">
+                @csrf
+                @method('PATCH')
+
+                <button type="submit">
+                    @if ($isDone)
+                        <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                            <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                    @else
+                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 hover:border-blue-500 transition-colors"></div>
+                    @endif
+                </button>
+            </form>
         </div>
         <div class="min-w-0">
             <p class="text-sm font-medium truncate

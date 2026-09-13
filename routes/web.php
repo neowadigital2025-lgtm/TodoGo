@@ -116,7 +116,7 @@ Route::middleware('auth')->group(function () {
         return [
             'user_id' => $user->id,
             'user_name' => $user->name,
-            'total_tasks' => $tasks->count(),
+            'total_tasks' => $tasks->count(), 
             'tasks' => $tasks->map(function($task) {
                 return [
                     'id' => $task->id,
@@ -128,5 +128,11 @@ Route::middleware('auth')->group(function () {
             })
         ];
     });
+
+    Route::patch('/tasks/{task}/toggle-status', [TaskController::class, 'toggleStatus'])
+    ->name('tasks.toggleStatus');
+
+    Route::delete('/tasks/completed/delete', [TaskController::class, 'destroyCompleted'])
+    ->name('tasks.destroyCompleted');
 
 });

@@ -28,7 +28,7 @@
                 actionHref="{{ route('tasks.create') }}"
                 icon='<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2" />' />
         @else
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 @foreach ($latestTasks as $task)
                     @php
                         $priorityColor = match($task->priority) {
@@ -45,6 +45,7 @@
                         };
                     @endphp
                     <x-dashboard.task-card
+                        class="h-full"
                         :title="$task->title"
                         :workspace="$task->workspace?->name ?? null"
                         :priority="$priorityLabel"
@@ -53,10 +54,6 @@
                         :progress="$task->progress ?? 0"
                         :done="$task->status === 'Done'"
                         :href="route('tasks.edit', $task)" />
-                    {{-- Debug info --}}
-                    @if($task->user_id !== auth()->id())
-                        <small class="text-xs text-red-500">Task dari user: {{ $task->user?->name ?? 'Unknown' }} (ID: {{ $task->user_id }})</small>
-                    @endif
                 @endforeach
             </div>
         @endif

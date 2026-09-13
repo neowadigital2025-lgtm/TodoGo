@@ -12,11 +12,20 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         $query = auth()->user()->tasks()->with('workspace');
+
+        // Get completed tasks
+        $completedTasks = auth()->user()
+            ->tasks()
+            ->where('status', 'Done')
+            ->get();
+            $completedCount = $completedTasks->count();
         
         // Search functionality
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%')
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
                   ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
         }
         
         // Priority filter
@@ -27,6 +36,30 @@ class TaskController extends Controller
         // Status filter
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        // Deadline / Filter functionality
+        if ($request->filled('filter')) {
+            $today = now()->format('Y-m-d');
+            if ($request->filter === 'today_overdue') {
+                $query->whereNotNull('due_date')
+                      ->whereDate('due_date', '<=', $today)
+                      ->where('status', '!=', 'Done');
+            } elseif ($request->filter === 'today') {
+                $query->whereNotNull('due_date')
+                      ->whereDate('due_date', '=', $today)
+                      ->where('status', '!=', 'Done');
+            } elseif ($request->filter === 'overdue') {
+                $query->whereNotNull('due_date')
+                      ->whereDate('due_date', '<', $today)
+                      ->where('status', '!=', 'Done');
+            } elseif ($request->filter === 'mendatang') {
+                $fiveDaysFromNow = now()->addDays(5)->format('Y-m-d');
+                $query->whereNotNull('due_date')
+                      ->whereDate('due_date', '>=', $today)
+                      ->whereDate('due_date', '<=', $fiveDaysFromNow)
+                      ->where('status', '!=', 'Done');
+            }
         }
         
         // Get tasks with sorting
@@ -62,7 +95,13 @@ class TaskController extends Controller
             }
         }
         
-        return view('tasks.index', compact('tasks', 'groupedTasks', 'groupBy'));
+        return view('tasks.index', compact(
+            'tasks',
+            'groupedTasks',
+            'groupBy',
+            'completedTasks',
+            'completedCount'
+        ));
     }
 
     public function create()
@@ -114,8 +153,42 @@ class TaskController extends Controller
             abort(403);
         }
 
-        $task->delete();
+        $task->forceDelete();
 
         return redirect()->route('tasks.index')->with('success', 'Task deleted successfully.');
     }
+
+    public function toggleStatus(Task $task)
+{
+    // Pastikan task milik user yang login
+    abort_if($task->user_id !== auth()->id(), 403);
+
+    if ($task->status === 'Done') {
+        $task->update([
+            'status' => 'Todo',
+            'progress' => 0,
+        ]);
+    } else {
+        $task->update([
+            'status' => 'Done',
+            'progress' => 100,
+        ]);
+    }
+
+    return back()->with('success', 'Status tugas berhasil diperbarui.');
+}
+
+    public function destroyCompleted()
+{
+    $deleted = auth()->user()
+        ->tasks()
+        ->where('status', 'Done')
+        ->forceDelete();
+
+    if ($deleted === 0) {
+        return back()->with('info', 'Tidak ada tugas yang telah selesai untuk dihapus.');
+    }
+
+    return back()->with('success', "{$deleted} tugas berhasil dihapus.");
+}
 }

@@ -17,20 +17,7 @@
 <div class="bg-white border border-slate-100 rounded-xl p-4 hover:shadow-sm
             transition-shadow duration-150 group relative">
 
-    <div class="absolute top-4 right-4 hidden group-hover:flex gap-1">
-        <a href="{{ route('tasks.edit', $task) }}" class="p-1 bg-white border border-slate-100 rounded shadow-sm text-slate-400 hover:text-blue-600 transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-        </a>
-        <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Yakin hapus?');">
-            @csrf @method('DELETE')
-            <button type="submit" class="p-1 bg-white border border-slate-100 rounded shadow-sm text-slate-400 hover:text-red-600 transition-colors">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            </button>
-        </form>
-    </div>
-
-    {{-- Header --}}
-    <div class="flex items-start justify-between gap-2 mb-3">
+    <div class="mb-3 flex items-center justify-between gap-2">
         <div class="flex items-center gap-2">
             @if ($isDone)
                 <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
@@ -45,11 +32,24 @@
                             group-hover:border-blue-400 transition-colors shrink-0"></div>
             @endif
         </div>
-        <x-ui.badge :color="$priorityColor">{{ $task->priority }}</x-ui.badge>
+        <div class="flex min-w-0 items-center gap-2">
+            <x-ui.badge :color="$priorityColor">{{ $task->priority }}</x-ui.badge>
+            <div class="flex shrink-0 items-center gap-1">
+        <a href="{{ route('tasks.edit', $task) }}" class="inline-flex min-h-8 min-w-8 items-center justify-center rounded border border-slate-100 bg-white text-slate-400 shadow-sm hover:text-blue-600 transition-colors" aria-label="Edit task">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+        </a>
+        <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Yakin hapus?');">
+            @csrf @method('DELETE')
+            <button type="submit" class="inline-flex min-h-8 min-w-8 items-center justify-center rounded border border-slate-100 bg-white text-slate-400 shadow-sm hover:text-red-600 transition-colors" aria-label="Hapus task">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+        </form>
+            </div>
+        </div>
     </div>
 
     {{-- Title --}}
-    <p class="text-sm font-semibold text-slate-800 leading-snug mb-1
+    <p class="break-words text-sm font-semibold text-slate-800 leading-snug mb-1
               {{ $isDone ? 'line-through text-slate-400' : '' }}">
         {{ $task->title }}
     </p>

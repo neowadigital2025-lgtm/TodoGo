@@ -18,10 +18,10 @@
             <h1 class="text-xl font-bold text-slate-800">Semua Tugas</h1>
             <p class="mt-0.5 text-sm text-slate-500">Kelola dan pantau semua tugasmu di satu tempat.</p>
         </div>
-        <div class="flex items-center gap-5">
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-5">
 
-        <a href="{{ route('tasks.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700
-                       text-white text-sm font-medium rounded-lg transition-colors shadow-sm shrink-0">
+        <a href="{{ route('tasks.create') }}" class="inline-flex w-full items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700
+                       text-white text-sm font-medium rounded-lg transition-colors shadow-sm shrink-0 sm:w-auto">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -32,7 +32,7 @@
             <form action="{{ route('tasks.destroyCompleted') }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus semua tugas yang sudah selesai? Tindakan ini tidak dapat dibatalkan.')">
             @csrf
             @method('DELETE')
-                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-blue-500 shadow-sm transition-all hover:bg-red-700 hover:shadow-md">
+                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-red-700 hover:shadow-md sm:w-auto">
             {{-- Icon Trash --}}
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -45,10 +45,10 @@
     </div>
 
     {{-- ── Filter bar ───────────────────────────────────────────────── --}}
-    <form method="GET" action="{{ route('tasks.index') }}" class="flex flex-col sm:flex-row items-start sm:items-center gap-3" id="filter-form">
+    <form method="GET" action="{{ route('tasks.index') }}" class="grid grid-cols-2 items-stretch gap-3 sm:flex sm:flex-row sm:items-center" id="filter-form">
 
         {{-- Search --}}
-        <div class="relative flex-1 max-w-xs">
+        <div class="relative col-span-2 w-full sm:max-w-xs sm:flex-1">
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -62,7 +62,7 @@
         </div>
 
         {{-- Priority filter --}}
-        <select name="priority" class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
+        <select name="priority" class="w-full min-w-0 px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
                        focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600"
                 onchange="document.getElementById('filter-form').submit()">
             <option value="">Semua Prioritas</option>
@@ -72,7 +72,7 @@
         </select>
 
         {{-- Status filter --}}
-        <select name="status" class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
+        <select name="status" class="w-full min-w-0 px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
                        focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600"
                 onchange="document.getElementById('filter-form').submit()">
             <option value="">Semua Status</option>
@@ -82,7 +82,7 @@
         </select>
 
         {{-- Tenggat filter --}}
-        <select name="filter" class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
+        <select name="filter" class="w-full min-w-0 px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg
                        focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600"
                 onchange="document.getElementById('filter-form').submit()">
             <option value="">Semua Tenggat</option>
@@ -94,14 +94,14 @@
         {{-- Clear filters --}}
         @if(request()->hasAny(['search', 'priority', 'status', 'filter']))
             <a href="{{ route('tasks.index') }}" 
-               class="px-3 py-2 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 
-                      rounded-lg hover:bg-slate-50 transition-colors">
+               class="col-span-2 px-3 py-2 text-center text-sm text-slate-500 hover:text-slate-700 border border-slate-200
+                       rounded-lg hover:bg-slate-50 transition-colors sm:col-span-1">
                 Bersihkan
             </a>
         @endif
 
         {{-- View toggle --}}
-        <div class="flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-lg ml-auto sm:ml-0">
+        <div class="col-span-2 flex w-full items-center justify-center gap-1 p-1 bg-white border border-slate-200 rounded-lg sm:col-span-1 sm:ml-0 sm:w-auto">
             <button type="button" @click="view = 'list'"
                     :class="view === 'list' ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'"
                     class="p-1.5 rounded-md transition-colors">
